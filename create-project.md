@@ -82,3 +82,67 @@ From https://github.com/manolete920/openshift-4
  * branch            main       -> FETCH_HEAD
 ```
 
+## rename branch
+
+```bash
+git checkout main
+git push --set-upstream origin main
+```
+
+## delete
+
+```bash
+D:\OpenShift\openshift-4>git branch -D main
+Deleted branch main (was 8981400).
+```
+
+## Rename master to main
+
+```bash
+D:\OpenShift\openshift-4>git branch -M main
+
+D:\OpenShift\openshift-4>git branch -a
+* main
+  remotes/origin/main
+```
+
+---
+
+```
+git push --set-upstream origin main
+```
+
+...
+
+```bash
+D:\OpenShift\openshift-4>git add .
+
+D:\OpenShift\openshift-4>git commit -m "initial commit"
+On branch main
+nothing to commit, working tree clean
+
+D:\OpenShift\openshift-4>git push
+fatal: The current branch main has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin main
+
+To have this happen automatically for branches without a tracking
+upstream, see 'push.autoSetupRemote' in 'git help config'.
+
+
+D:\OpenShift\openshift-4>git push --set-upstream origin main
+Enumerating objects: 4, done.
+Counting objects: 100% (4/4), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 1.17 KiB | 66.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+To https://github.com/manolete920/openshift-4.git
+   8981400..558d12e  main -> main
+branch 'main' set up to track 'origin/main'.
+
+D:\OpenShift\openshift-4>git push
+Everything up-to-date
+```
+
