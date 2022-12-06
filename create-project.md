@@ -146,3 +146,168 @@ D:\OpenShift\openshift-4>git push
 Everything up-to-date
 ```
 
+# Permission to a Default service account
+
+To add the view role to the default service account in the `user-getting-started project`, enter the following command:
+
+```bash
+oc adm policy add-role-to-user view -z default -n user-getting-started
+```
+
+example
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc adm policy add-role-to-user view -z default -n user-getting-started
+clusterrole.rbac.authorization.k8s.io/view added: "default"
+```
+
+# Deploy an application
+
+[Command-line walkthrough | Getting started | OpenShift Container Platform 4.11](https://docs.openshift.com/container-platform/4.11/getting_started/openshift-cli.html)
+
+```bash
+oc new-app quay.io/openshiftroadshow/parksmap:latest --name=parksmap -l 'app=national-parks-app,component=parksmap,role=frontend,app.kubernetes.io/part-of=national-parks-app'
+```
+
+output
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc new-app quay.io/openshiftroadshow/parksmap:latest --name=parksmap -l 'app=national-parks-app,component=parksmap,role=frontend,app.kubernetes.io/part-of=national-parks-app'
+--> Found container image 0c2f55f (22 months old) from quay.io for "quay.io/openshiftroadshow/parksmap:latest"
+
+    * An image stream tag will be created as "parksmap:latest" that will track this image
+
+--> Creating resources with label app=national-parks-app,app.kubernetes.io/part-of=national-parks-app,component=parksmap,role=frontend ...
+    imagestream.image.openshift.io "parksmap" created
+    deployment.apps "parksmap" created
+    service "parksmap" created
+--> Success
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/parksmap'
+    Run 'oc status' to view your app.
+```
+
+# Check the service created
+
+```bash
+oc get service
+```
+
+example
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc get service
+NAME       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+parksmap   ClusterIP   172.30.75.71   <none>        8080/TCP   117s
+```
+
+# Route
+
+## Create Rout
+
+```bash
+oc create route edge parksmap --service=parksmap
+```
+
+example
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc create route edge parksmap --service=parksmap
+route.route.openshift.io/parksmap created
+```
+
+## Retrieve the route
+
+```bash
+oc get route
+```
+
+example
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc get route
+NAME       HOST/PORT                                                                    PATH   SERVICES   PORT       TERMINATION   WILDCARD
+parksmap   parksmap-user-getting-started.apps.cluster-7z6mg.7z6mg.example.opentlc.com          parksmap   8080-tcp   edge          None
+```
+
+## get pods
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc get pods
+NAME                        READY   STATUS    RESTARTS   AGE
+parksmap-77874c6bb8-wgwzn   1/1     Running   0          11m
+```
+
+# Scale application
+
+## up
+
+```bash
+oc scale --current-replicas=1 --replicas=2 deployment/parksmap
+```
+
+output
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc scale --current-replicas=1 --replicas=2 deployment/parksmap
+deployment.apps/parksmap scaled
+manolete919@SIS_CEN1_071:~$ oc get pods
+NAME                        READY   STATUS    RESTARTS   AGE
+parksmap-77874c6bb8-dhlxg   1/1     Running   0          12s
+parksmap-77874c6bb8-wgwzn   1/1     Running   0          32m
+```
+
+## down
+
+```bash
+oc scale --current-replicas=2 --replicas=1 deployment/parksmap
+```
+
+# Backend application
+
+```bash
+oc new-app python~https://github.com/openshift-roadshow/nationalparks-py.git --name nationalparks -l 'app=national-parks-app,component=nationalparks,role=backend,app.kubernetes.io/part-of=national-parks-app,app.kubernetes.io/name=python' --allow-missing-images=true
+```
+
+output
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc new-app python~https://github.com/openshift-roadshow/nationalparks-py.git --name nationalparks -l 'app=national-parks-app,component=nationalparks,role=backend,app.kubernetes.io/part-of=national-parks-app,app.kubernetes.io/name=python' --allow-missing-images=true
+warning: Cannot check if git requires authentication.
+--> Found image 43bfd08 (6 days old) in image stream "openshift/python" under tag "3.9-ubi8" for "python"
+
+    Python 3.9
+    ----------
+    Python 3.9 available as container is a base platform for building and running various Python 3.9 applications and frameworks. Python is an easy to learn, powerful programming language. It has efficient high-level data structures and a simple but effective approach to object-oriented programming. Python's elegant syntax and dynamic typing, together with its interpreted nature, make it an ideal language for scripting and rapid application development in many areas on most platforms.
+
+    Tags: builder, python, python39, python-39, rh-python39
+
+    * A source build using source code from https://github.com/openshift-roadshow/nationalparks-py.git will be created
+      * The resulting image will be pushed to image stream tag "nationalparks:latest"
+      * Use 'oc start-build' to trigger a new build
+
+--> Creating resources with label app=national-parks-app,app.kubernetes.io/name=python,app.kubernetes.io/part-of=national-parks-app,component=nationalparks,role=backend ...
+    imagestream.image.openshift.io "nationalparks" created
+    buildconfig.build.openshift.io "nationalparks" created
+    deployment.apps "nationalparks" created
+    service "nationalparks" created
+--> Success
+    Build scheduled, use 'oc logs -f buildconfig/nationalparks' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/nationalparks'
+    Run 'oc status' to view your app.
+```
+
+## route
+
+```bash
+oc create route edge nationalparks --service=nationalparks
+```
+
+output
+
+```bash
+manolete919@SIS_CEN1_071:~$ oc create route edge nationalparks --service=nationalparks
+route.route.openshift.io/nationalparks created
+```
+
