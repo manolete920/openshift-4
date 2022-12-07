@@ -203,7 +203,7 @@ parksmap   ClusterIP   172.30.75.71   <none>        8080/TCP   117s
 
 # Route
 
-## Create Rout
+## Create Route
 
 ```bash
 oc create route edge parksmap --service=parksmap
@@ -309,5 +309,150 @@ output
 ```bash
 manolete919@SIS_CEN1_071:~$ oc create route edge nationalparks --service=nationalparks
 route.route.openshift.io/nationalparks created
+```
+
+## Get Route
+
+```
+oc get route
+```
+
+example
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc get route
+NAME            HOST/PORT                                                                         PATH   SERVICES        PORT       TERMINATION   WILDCARD
+nationalparks   nationalparks-user-getting-started.apps.cluster-7z6mg.7z6mg.example.opentlc.com          nationalparks   8080-tcp   edge          None
+parksmap        parksmap-user-getting-started.apps.cluster-7z6mg.7z6mg.example.opentlc.com               parksmap        8080-tcp   edge          None
+```
+
+## Connect to the Mongo Data Base
+
+To connect to a database, enter the following command:
+
+```bash
+oc new-app quay.io/centos7/mongodb-36-centos7 --name mongodb-nationalparks -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=mongodb -e MONGODB_ADMIN_PASSWORD=mongodb -l 'app.kubernetes.io/part-of=national-parks-app,app.kubernetes.io/name=mongodb'
+```
+
+example
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc new-app quay.io/centos7/mongodb-36-centos7 --name mongodb-nationalparks -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=mongodb -e MONGODB_ADMIN_PASSWORD=mongodb -l 'app.kubernetes.io/part-of=national-parks-app,app.kubernetes.io/name=mongodb'
+--> Found container image dc18f52 (18 months old) from quay.io for "quay.io/centos7/mongodb-36-centos7"
+
+    MongoDB 3.6
+    -----------
+    MongoDB (from humongous) is a free and open-source cross-platform document-oriented database program. Classified as a NoSQL database program, MongoDB uses JSON-like documents with schemas. This container image contains programs to run mongod server.
+
+    Tags: database, mongodb, rh-mongodb36
+
+    * An image stream tag will be created as "mongodb-nationalparks:latest" that will track this image
+
+--> Creating resources with label app.kubernetes.io/name=mongodb,app.kubernetes.io/part-of=national-parks-app ...
+    imagestream.image.openshift.io "mongodb-nationalparks" created
+    deployment.apps "mongodb-nationalparks" created
+    service "mongodb-nationalparks" created
+--> Success
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/mongodb-nationalparks'
+    Run 'oc status' to view your app.
+```
+
+# Secret
+
+https://docs.openshift.com/container-platform/4.11/getting_started/openshift-cli.html
+
+## Create a secret
+
+```bash
+oc create secret generic nationalparks-mongodb-parameters --from-literal=DATABASE_SERVICE_NAME=mongodb-nationalparks --from-literal=MONGODB_USER=mongodb --from-literal=MONGODB_PASSWORD=mongodb --from-literal=MONGODB_DATABASE=mongodb --from-literal=MONGODB_ADMIN_PASSWORD=mongodb
+```
+
+example
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc create secret generic nationalparks-mongodb-parameters --from-literal=DATABASE_SERVICE_NAME=mongodb-nationalparks --from-literal=MONGODB_USER=mongodb --from-literal=MONGODB_PASSWORD=mongodb --from-literal=MONGODB_DATABASE=mongodb --from-literal=MONGODB_ADMIN_PASSWORD=mongodb
+secret/nationalparks-mongodb-parameters created
+```
+
+## update deployment with new environment variables
+
+To update the environment variable to attach the mongodb secret to the `nationalpartks` workload, enter the following command:
+
+```bash
+oc set env --from=secret/nationalparks-mongodb-parameters deploy/nationalparks
+```
+
+output
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc set env --from=secret/nationalparks-mongodb-parameters deploy/nationalparks
+deployment.apps/nationalparks updated
+```
+
+Check status
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc rollout status deployment nationalparks
+deployment "nationalparks" successfully rolled out
+```
+
+To show the status of the `mongodb-nationalparks` deployment, enter the following command:
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc rollout status deployment mongodb-nationalparks
+deployment "mongodb-nationalparks" successfully rolled out
+```
+
+### Loading data and displaying the national parks map
+
+https://docs.openshift.com/container-platform/4.11/getting_started/openshift-cli.html#getting-started-cli-load-data-output_openshift-cli
+
+To load national parks data, enter the following command:
+
+```bash
+oc exec $(oc get pods -l component=nationalparks | tail -n 1 | awk '{print $1;}') -- curl -s http://localhost:8080/ws/data/load
+```
+
+output
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc exec $(oc get pods -l component=nationalparks | tail -n 1 | awk '{print $1;}') -- curl -s http://localhost:8080/ws/data/load
+"Items inserted in database: 2893"
+```
+
+To verify that your data is loaded properly, enter the following command:
+
+```bash
+oc exec $(oc get pods -l component=nationalparks | tail -n 1 | awk '{print $1;}') -- curl -s http://localhost:8080/ws/data/all
+```
+
+To add labels to the route, enter the following command:
+
+```bash
+oc label route nationalparks type=parksmap-backend
+```
+
+output
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc label route nationalparks type=parksmap-backend
+route.route.openshift.io/nationalparks labeled
+```
+
+get routes
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc get routes
+
+NAME            HOST/PORT                                                                         PATH   SERVICES        PORT       TERMINATION   WILDCARD
+nationalparks   nationalparks-user-getting-started.apps.cluster-7z6mg.7z6mg.example.opentlc.com          nationalparks   8080-tcp   edge          None
+parksmap        parksmap-user-getting-started.apps.cluster-7z6mg.7z6mg.example.opentlc.com               parksmap        8080-tcp   edge          None
+```
+
+url
+
+```bash
+https://parksmap-user-getting-started.apps.cluster-7z6mg.7z6mg.example.opentlc.com/
 ```
 

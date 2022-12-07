@@ -1,0 +1,234 @@
+﻿kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '2'
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"mongodb-nationalparks:latest","namespace":"user-getting-started"},"fieldPath":"spec.template.spec.containers[?(@.name==\"mongodb-nationalparks\")].image","pause":"true"}]
+    openshift.io/generated-by: OpenShiftNewApp
+  resourceVersion: '4723371'
+  name: mongodb-nationalparks
+  uid: d0895e40-4183-46ed-995e-1aa8d6d2bfc8
+  creationTimestamp: '2022-12-07T00:32:41Z'
+  generation: 2
+  managedFields:
+    - manager: oc
+      operation: Update
+      apiVersion: apps/v1
+      time: '2022-12-07T00:32:41Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:image.openshift.io/triggers': {}
+            'f:openshift.io/generated-by': {}
+          'f:labels':
+            .: {}
+            'f:app': {}
+            'f:app.kubernetes.io/component': {}
+            'f:app.kubernetes.io/instance': {}
+            'f:app.kubernetes.io/name': {}
+            'f:app.kubernetes.io/part-of': {}
+        'f:spec':
+          'f:progressDeadlineSeconds': {}
+          'f:replicas': {}
+          'f:revisionHistoryLimit': {}
+          'f:selector': {}
+          'f:strategy':
+            'f:rollingUpdate':
+              .: {}
+              'f:maxSurge': {}
+              'f:maxUnavailable': {}
+            'f:type': {}
+          'f:template':
+            'f:metadata':
+              'f:annotations':
+                .: {}
+                'f:openshift.io/generated-by': {}
+              'f:labels':
+                .: {}
+                'f:app.kubernetes.io/name': {}
+                'f:app.kubernetes.io/part-of': {}
+                'f:deployment': {}
+            'f:spec':
+              'f:containers':
+                'k:{"name":"mongodb-nationalparks"}':
+                  'f:volumeMounts':
+                    .: {}
+                    'k:{"mountPath":"/var/lib/mongodb/data"}':
+                      .: {}
+                      'f:mountPath': {}
+                      'f:name': {}
+                  'f:terminationMessagePolicy': {}
+                  .: {}
+                  'f:resources': {}
+                  'f:env':
+                    .: {}
+                    'k:{"name":"MONGODB_ADMIN_PASSWORD"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"MONGODB_DATABASE"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"MONGODB_PASSWORD"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"MONGODB_USER"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                  'f:terminationMessagePath': {}
+                  'f:imagePullPolicy': {}
+                  'f:ports':
+                    .: {}
+                    'k:{"containerPort":27017,"protocol":"TCP"}':
+                      .: {}
+                      'f:containerPort': {}
+                      'f:protocol': {}
+                  'f:name': {}
+              'f:dnsPolicy': {}
+              'f:restartPolicy': {}
+              'f:schedulerName': {}
+              'f:securityContext': {}
+              'f:terminationGracePeriodSeconds': {}
+              'f:volumes':
+                .: {}
+                'k:{"name":"mongodb-nationalparks-volume-1"}':
+                  .: {}
+                  'f:emptyDir': {}
+                  'f:name': {}
+    - manager: openshift-controller-manager
+      operation: Update
+      apiVersion: apps/v1
+      time: '2022-12-07T00:32:41Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          'f:template':
+            'f:spec':
+              'f:containers':
+                'k:{"name":"mongodb-nationalparks"}':
+                  'f:image': {}
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: apps/v1
+      time: '2022-12-07T00:32:52Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:deployment.kubernetes.io/revision': {}
+        'f:status':
+          'f:availableReplicas': {}
+          'f:conditions':
+            .: {}
+            'k:{"type":"Available"}':
+              .: {}
+              'f:lastTransitionTime': {}
+              'f:lastUpdateTime': {}
+              'f:message': {}
+              'f:reason': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Progressing"}':
+              .: {}
+              'f:lastTransitionTime': {}
+              'f:lastUpdateTime': {}
+              'f:message': {}
+              'f:reason': {}
+              'f:status': {}
+              'f:type': {}
+          'f:observedGeneration': {}
+          'f:readyReplicas': {}
+          'f:replicas': {}
+          'f:updatedReplicas': {}
+      subresource: status
+  namespace: user-getting-started
+  labels:
+    app: mongodb-nationalparks
+    app.kubernetes.io/component: mongodb-nationalparks
+    app.kubernetes.io/instance: mongodb-nationalparks
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/part-of: national-parks-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mongodb
+      app.kubernetes.io/part-of: national-parks-app
+      deployment: mongodb-nationalparks
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/name: mongodb
+        app.kubernetes.io/part-of: national-parks-app
+        deployment: mongodb-nationalparks
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+    spec:
+      volumes:
+        - name: mongodb-nationalparks-volume-1
+          emptyDir: {}
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: mongodb-nationalparks
+          env:
+            - name: MONGODB_ADMIN_PASSWORD
+              value: mongodb
+            - name: MONGODB_DATABASE
+              value: mongodb
+            - name: MONGODB_PASSWORD
+              value: mongodb
+            - name: MONGODB_USER
+              value: mongodb
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: mongodb-nationalparks-volume-1
+              mountPath: /var/lib/mongodb/data
+          terminationMessagePolicy: File
+          image: >-
+            quay.io/centos7/mongodb-36-centos7@sha256:29688b31c40a0c8aceb454e244af48e04ebf2939979e5c2b782c8e94b665ae2b
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+      imagePullSecrets: []
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+  paused: false
+status:
+  observedGeneration: 2
+  replicas: 1
+  updatedReplicas: 1
+  readyReplicas: 1
+  availableReplicas: 1
+  conditions:
+    - type: Available
+      status: 'True'
+      lastUpdateTime: '2022-12-07T00:32:52Z'
+      lastTransitionTime: '2022-12-07T00:32:52Z'
+      reason: MinimumReplicasAvailable
+      message: Deployment has minimum availability.
+    - type: Progressing
+      status: 'True'
+      lastUpdateTime: '2022-12-07T00:32:52Z'
+      lastTransitionTime: '2022-12-07T00:32:41Z'
+      reason: NewReplicaSetAvailable
+      message: >-
+        ReplicaSet "mongodb-nationalparks-6684746d65" has successfully
+        progressed.
