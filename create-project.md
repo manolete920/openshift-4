@@ -456,3 +456,63 @@ url
 https://parksmap-user-getting-started.apps.cluster-7z6mg.7z6mg.example.opentlc.com/
 ```
 
+# Authentication
+
+https://docs.openshift.com/container-platform/4.11/authentication/understanding-authentication.html
+
+```
+manolete919@DESKTOP-KA8AA9P:~$ oc login --token=sha256~Zvn20WmNhcf4QMhPIwUL6INe_5Ojq7BpKMPBLhyy4_g --server=https://api.cluster-7z6mg.7z6mg.example.opentlc.com:6443
+Logged into "https://api.cluster-7z6mg.7z6mg.example.opentlc.com:6443" as "user101" using the token provided.
+
+You have access to 74 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "user-getting-started".
+manolete919@DESKTOP-KA8AA9P:~$ oc get route oauth-openshift -n openshift-authentication -o json | jq .spec.host
+"oauth-openshift.apps.cluster-7z6mg.7z6mg.example.opentlc.com"
+```
+
+example
+
+
+
+```bash
+https://oauth-openshift.apps.cluster-7z6mg.7z6mg.example.opentlc.com/oauth/token/display
+```
+
+All requests for OAuth tokens involve a request to `<namespace_route>/oauth/authorize`.
+
+
+
+## Listing user-owned OAuth access tokens
+
+https://docs.openshift.com/container-platform/4.11/authentication/managing-oauth-access-tokens.html#oauth-list-tokens_managing-oauth-access-tokens
+
+```bash
+oc get useroauthaccesstokens
+```
+
+output
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc get useroauthaccesstokens
+NAME                                                 CLIENT NAME                CREATED                EXPIRES                         REDIRECT URI                                                                                   SCOPES
+sha256~0vezWBMeCkZrJXeZwHVpyRQlYjAvZNwqvEgIsrt-Xt8   console                    2022-12-06T16:06:12Z   2022-12-07 16:06:12 +0000 UTC   https://console-openshift-console.apps.cluster-7z6mg.7z6mg.example.opentlc.com/auth/callback   user:full
+sha256~Di_U08NnDWes-6K0xQU6-UL0pmlpr7hgPETtzZxKt_c   console                    2022-12-07T02:30:11Z   2022-12-08 02:30:11 +0000 UTC   https://console-openshift-console.apps.cluster-7z6mg.7z6mg.example.opentlc.com/auth/callback   user:full
+sha256~aEGb_qEbqnXJXoIbCJCAwXNYEpUapCxLd9txXgi750Y   openshift-browser-client   2022-12-07T02:30:23Z   2022-12-08 02:30:23 +0000 UTC   https://oauth-openshift.apps.cluster-7z6mg.7z6mg.example.opentlc.com/oauth/token/display       user:full
+```
+
+List user-owned OAuth access tokens for a particular OAuth client:
+
+```bash
+manolete919@DESKTOP-KA8AA9P:~$ oc get useroauthaccesstokens --field-selector=clientName="console"
+NAME                                                 CLIENT NAME   CREATED                EXPIRES                         REDIRECT URI                                                                                   SCOPES
+sha256~0vezWBMeCkZrJXeZwHVpyRQlYjAvZNwqvEgIsrt-Xt8   console       2022-12-06T16:06:12Z   2022-12-07 16:06:12 +0000 UTC   https://console-openshift-console.apps.cluster-7z6mg.7z6mg.example.opentlc.com/auth/callback   user:full
+sha256~Di_U08NnDWes-6K0xQU6-UL0pmlpr7hgPETtzZxKt_c   console       2022-12-07T02:30:11Z   2022-12-08 02:30:11 +0000 UTC   https://console-openshift-console.apps.cluster-7z6mg.7z6mg.example.opentlc.com/auth/callback   user:full
+```
+
+## RBAC
+
+```bash
+https://docs.openshift.com/container-platform/4.11/authentication/using-rbac.html
+```
+
